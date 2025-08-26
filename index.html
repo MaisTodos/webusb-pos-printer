@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en-us">
+    <head>
+        <meta charset="utf-8" />
+        <title>WebUSB Test</title>
+    </head>
+    <body>
+        <button id="print-button">Print</button>
+
+        <script src="webusb-pos-printer.js"></script>
+        <script>
+            const sample_response = {
+                data:
+                    "                 BIN\n" +
+                    "        VIA - ESTABELECIMENTO\n" +
+                    "--REIMPRESSAO---\n" +
+                    "Avenida Presidente Vargas\n" +
+                    "              MaisTodos\n" +
+                    "Ribeirao Preto/SP             AA102612\n" +
+                    "EC:000000047134960       TERM:TFI31FCD\n" +
+                    "       CNPJ: 32.451.813/0001-94\n" +
+                    "           ************2713\n" +
+                    "AUT=304404   CV=600000001   DOC=531554\n" +
+                    "01/04/25       15:22:22              M\n" +
+                    "MAESTRO\n" +
+                    "DEBITO A VISTA\n" +
+                    "--REIMPRESSAO---\n" +
+                    "VALOR                            30,00\n" +
+                    "\n" +
+                    "\n" +
+                    "    CREDENC. FISERV BRASIL IP LTDA\n" +
+                    "        ARQC: 64CAB8E6ECC2486D\n" +
+                    "               MAESTRO\n" +
+                    "          AID:A0000000043060\n" +
+                    "          SiTef from Fiserv\n" +
+                    "\n",
+            };
+
+            document
+                .getElementById("print-button")
+                .addEventListener("click", async () => {
+                    try {
+                        await webusbPosPrinter.printText(sample_response.data);
+                    } catch (e) {
+                        console.error(e);
+                        console.log("Fallback: executar fluxo antigo");
+                    }
+                });
+        </script>
+    </body>
+</html>
