@@ -21,17 +21,17 @@ if ($driver_package) {
     Start-Process -FilePath cmd.exe -ArgumentList '/c',$uninstall_string -Wait
 }
 
-foreach ($device_id in $device_ids) {
-	$device_vid = $device_id.VID
-	$device_pid = $device_id.PID
+$found = $false
 
+foreach ($device_id in $device_ids) {
 	$devices = Get-PnpDevice | Where-Object {
-		$_.InstanceId -match "VID_$device_vid&PID_$device_pid" 
+		$_.InstanceId -match "VID_$($device_id.VID)&PID_$($device_id.PID)" 
 	}
 
     if ($devices) {
+        $found = $true
         Write-Output 'Substituindo driver para o dispositivo:'
-        Write-Output "  VID=$device_vid PID=$device_pid"
+        Write-Output "  VID=$($device_id.VID) PID=$($device_id.PID)"
 
         foreach ($device in $devices) {
             pnputil /remove-device $device.InstanceId /force
@@ -40,9 +40,17 @@ foreach ($device_id in $device_ids) {
         .\wdi-simple.exe --stealth-cert -t 0 `
             -n $name `
             -m $manufacturer `
-            -v 0x$device_vid `
-            -p 0x$device_pid
+            -v 0x$($device_id.VID) `
+            -p 0x$($device_id.PID)
 
         pnputil /scan-devices
     }
 }
+
+if ($found) {
+    Write-Output 'Drivers instalados com sucesso!'
+} else {
+    Write-Output 'Nenhuma impressora conhecida foi encontrada.'
+}
+
+Read-Host -Prompt 'Pressione Enter para fechar' | Out-Null
