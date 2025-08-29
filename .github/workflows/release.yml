@@ -30,7 +30,7 @@ jobs:
           gh release upload ${{ github.event.release.tag_name }} install_driver.exe
 
   upload_library:
-    name: Build Driver Installer
+    name: Upload Javascript Library
     runs-on: ubuntu-latest
 
     steps:
