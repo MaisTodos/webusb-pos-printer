@@ -1,0 +1,44 @@
+on:
+  release:
+    types: [published]
+
+jobs:
+  build_installer:
+    name: Build Driver Installer
+    runs-on: windows-11-arm
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          Set-PSRepository PSGallery -InstallationPolicy Trusted
+          Install-Module PS2EXE
+
+      - name: Build
+        run: |
+          cd driver_installer
+          .\build.ps1
+
+      - name: Upload Release
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.TOKEN }}
+        run: |
+          gh release upload ${{ github.event.release.tag_name }} install_driver.exe
+
+  upload_library:
+    name: Build Driver Installer
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Upload Release
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.TOKEN }}
+        run: |
+          gh release upload ${{ github.event.release.tag_name }} webusb-pos-printer.js
