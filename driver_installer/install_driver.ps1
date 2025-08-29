@@ -19,8 +19,6 @@ if ($driver_package) {
     Write-Output 'Driver do fabricante encontrado, desinstalando...'
     $uninstall_string = $driver_package.Meta.Attributes['QuietUninstallString']
     Start-Process -FilePath cmd.exe -ArgumentList '/c',$uninstall_string -Wait
-} else {
-    Write-Output 'Driver do fabricante não encontrado, continuando...'
 }
 
 foreach ($device_id in $device_ids) {
