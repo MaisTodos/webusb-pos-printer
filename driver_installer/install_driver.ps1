@@ -92,7 +92,7 @@ function Main {
 
         Write-Host 'Drivers instalados com sucesso!'
     } else {
-        Write-Error 'Nenhuma impressora conhecida foi encontrada.'
+        Write-Host 'Nenhuma impressora conhecida foi encontrada.'
     }
 }
 
