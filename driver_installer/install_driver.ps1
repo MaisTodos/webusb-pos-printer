@@ -76,12 +76,12 @@ function Replace-Device-Driver {
 
 
 function Main {
+    pnputil /scan-devices | Out-Null
+
     $found_devices = Find-Existing-Devices
 
     if ($found_devices) {
         Uninstall-Manufacturer-Driver
-
-        pnputil /scan-devices | Out-Null
 
         foreach ($found_device in $found_devices) {
             Replace-Device-Driver $found_device
@@ -91,12 +91,14 @@ function Main {
 
         Write-Host 'Drivers instalados com sucesso!'
     } else {
-        Write-Host 'Nenhuma impressora conhecida foi encontrada.'
+        Write-Error 'Nenhuma impressora conhecida foi encontrada.'
     }
 }
 
 try {
     Main
-} finally {
-    Read-Host -Prompt 'Pressione Enter para fechar' | Out-Null
+} catch {
+    Write-Error $_
 }
+
+Read-Host -Prompt 'Pressione Enter para fechar' | Out-Null
