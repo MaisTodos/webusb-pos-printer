@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>AgenteCliSiTef</title>
+  <link rel="stylesheet" type="text/css" href="style.css" media="all" />
+  <script src="jquery-3.2.1.min.js"></script>
+  <script src="agenteCliSiTef.js"></script>
+  <meta http-equiv="pragma" content="no-cache" />
+  <meta http-equiv="expires" content="1" />
+  <meta http-equiv="content-type" content="text/html;charset=iso-8859-1" />
+</head>
+<body>
+  <header>
+    <h2>Exemplo AgenteCliSiTef - outras funções</h2>
+  </header>
+  <form>
+    <div id="tef_setup">
+      <div class="toolbar">
+        <a class="lnk1" href="sessao.html">outras funções</a>
+      </div>
+      <div class="wrapper">
+        <div class="limit">
+          <!-- Parameters -->
+          <input type="hidden" id="SESSAO_PARAMS" value="" />
+          <input type="hidden" id="VALOR" value="" />
+          <input type="hidden" id="CUPOMFISCAL" value="1234" />
+          <input type="hidden" id="DATAFISCAL" value="20170304" />
+          <input type="hidden" id="HORAFISCAL" value="170000" />
+          <input type="hidden" id="OPERADOR" value="CAIXA" />
+          <input type="hidden" id="TRN_PARAMADIC" value="" />
+
+          <!-- Configuration -->
+          <table>
+            <tr>
+              <td align="right">IP SiTef</td>
+              <td><input type="text" id="SITEF" value="127.0.0.1" /></td>
+            </tr>
+            <tr>
+              <td align="right">Empresa</td>
+              <td><input type="text" id="EMPRESA" value="00000000" /></td>
+            </tr>
+            <tr>
+              <td align="right">Terminal</td>
+              <td><input type="text" id="TERMINAL" value="REST0001" /></td>
+            </tr>
+          </table>
+
+          <!-- Buttons -->
+          <table>
+            <tr>
+              <td valign="center" align="right">Agente CliSiTef</td>
+              <td>
+                <table cellspacing="5">
+                  <tr>
+                    <td width="150">
+                      <input type="button" class="btn1" value="Consulta estado" onclick="obtemEstado();" title="Consulta o estado atual do Agente CliSiTef" />
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td valign="center" align="right">Funções de sessão</td>
+              <td>
+                <table cellspacing="5">
+                  <tr>
+                    <td width="150">
+                      <input type="button" class="btn1" value="Criar sessão" onclick="criaSessaoId();" title="Cria uma chave de sessão, descartando a anterior, caso exista" />
+                    </td>
+                    <td width="150">
+                      <input type="button" class="btn1" value="Obter sessão" onclick="obtemSessaoId();" title="Obtém a chave de sessão, anteriormente criada via session/create" />
+                    </td>
+                    <td width="150">
+                      <input type="button" class="btn1" value="Finaliza sessão" onclick="destroiSessaoId();" title="Descarta a chave de sessão, anteriormente criada via session/create" />
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td valign="center" align="right">Geral</td>
+              <td>
+                <table cellspacing="5">
+                  <tr>
+                    <td width="150">
+                      <input type="button" class="btn1" value="Obter versões" onclick="obtemVersoes();" title="Obtem versões das bibliotecas" />
+                    </td>
+                    <td width="150">
+                      <input type="button" class="btn1" value="Administrativo" onclick="inicio(2, 110);" title="Funções administrativas na clisitef" />
+                    </td>
+					<td width="150">
+                      <input type="button" class="btn1" value="RegistroTerminal" onclick="inicio(2, 699);" title="Registro de Terminal" />
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td valign="center" align="right">Funções de pinpad</td>
+              <td>
+                <table cellspacing="5">
+                  <tr>
+                    <td width="150">
+                      <input type="button" class="btn1" value="Abre PinPad" onclick="pinpadAbre();" />
+                    </td>
+                    <td width="150">
+                      <input type="button" class="btn1" value="Fecha PinPad" onclick="pinpadFecha();" />
+                    </td>
+                    <td width="150">
+                      <input type="button" class="btn1" value="Presença PinPad" onclick="pinpadPresente();" />
+                    </td>
+                    <td width="150">
+                      <input type="button" class="btn1" value="Mensagem" onclick="pinpadMensagem('PDV Alegria',false);" />
+                    </td>
+                    <td width="150">
+                      <input type="button" class="btn1" value="Mensagem permanente" onclick="pinpadMensagem('Seja bem-vindo',true);" />
+                    </td>
+                  </tr>
+                  <tr>
+                    <td width="150">
+                      <input type="button" class="btn1" value="Sim/Não" onclick="pinpadLeSimNao('Anula ou Entra',true);" />
+                    </td>
+                    <td width="150">
+                      <input type="button" class="btn1" value="Informações" onclick="inicio(2, 775);" title="Obtém informações do PinPad" />
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div id="tef_transacao">
+      <div class="wrapper">
+        <div class="limit">
+          <div id="tef_titulo" class="trn-header"></div>
+          <br />
+          <div id="tef_corpo"></div>
+        </div>
+      </div>
+    </div>
+  </form>
+</body>
+</html>
