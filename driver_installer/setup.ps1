@@ -13,25 +13,18 @@ $printer_name = 'MaisTODOS POS Series Printer'
 
 # --- Mapeamento de dispositivos conhecidos ---
 
-# Dispositivo local para testes:
-# @{ vid = '0BDA'; pid = '554A' }
-
 $pos_device_ids = @{
     ingenico = @(
-        @{ vid = '0BDA'; pid = '554A' }
-    );
+    )
     gertec = @(
-        @{ vid = '0BDA'; pid = '554A' }
     )
 }
 
 $printer_device_ids = @(
-    @{ vid = '0BDA'; pid = '554A' },
-
-    @{ vid = '0416'; pid = '5011' },
-    @{ vid = '0456'; pid = '0808' },
-    @{ vid = '0483'; pid = '070B' },
-    @{ vid = '0519'; pid = '2015' },
+    @{ vid = '0416'; pid = '5011' }
+    @{ vid = '0456'; pid = '0808' }
+    @{ vid = '0483'; pid = '070B' }
+    @{ vid = '0519'; pid = '2015' }
     @{ vid = '28E9'; pid = '0289' }
 )
 
@@ -79,18 +72,18 @@ function Install-PosDrivers ($Devices) {
 
         switch ($device_brand) {
             "gertec" {
-                if (Find-InstalledPackage -Pattern "Gertec*") {
-                    Write-Host "Driver da maquininha Gertec já está instalado."
+                if (Find-InstalledPackage -Pattern 'Gertec*') {
+                    Write-Output 'Driver da maquininha Gertec já está instalado.'
                 } else {
-                    Write-Host "Instalando driver da maquininha Gertec..."
+                    Write-Output 'Instalando driver da maquininha Gertec...'
                     $install_string = ".\gertec-installer.exe"
                 }
             }
             "ingenico" {
-                if (Find-InstalledPackage -Pattern "Ingenico*") {
-                    Write-Host "Driver da maquininha Ingenico já está instalado."
+                if (Find-InstalledPackage -Pattern 'Ingenico*') {
+                    Write-Output 'Driver da maquininha Ingenico já está instalado.'
                 } else {
-                    Write-Host "Instalando driver da maquininha Ingenico..."
+                    Write-Output 'Instalando driver da maquininha Ingenico...'
                     $install_string = ".\ingenico-installer.exe"
                 }
             }
@@ -113,8 +106,8 @@ function Find-PrinterDevices {
 
         if ($devices) {
             $found += @{
-                vid = $device_id.vid;
-                pid = $device_id.pid;
+                vid = $device_id.vid
+                pid = $device_id.pid
                 devices = $devices
             }
         }
@@ -126,26 +119,25 @@ function Find-PrinterDevices {
 
 function Replace-PrinterDrivers ($Printers) {
     if ($driver_package = Find-InstalledPackage -Pattern "POS Series Printer Driver*") {
-        Write-Host 'Removendo driver do fabricante da impressora...'
+        Write-Output 'Removendo driver do fabricante da impressora...'
         Uninstall-Package -Package $driver_package
     }
 
     foreach ($printer in $Printers) {
-        Write-Host "Impressora encontrada: VID=$($printer.vid) PID=$($printer.pid)"
+        Write-Output "Impressora encontrada: VID=$($printer.vid) PID=$($printer.pid)"
 
         $already_installed = $false
         foreach ($device in $printer.devices) {
             if ($device.Manufacturer -eq $printer_manufacturer) {
-                Write-Host $device
                 $already_installed = $true
             }
         }
         if ($already_installed) {
-            Write-Host 'Driver já está instalado.'
+            Write-Output 'Driver já está instalado.'
             continue
         }
 
-        Write-Host 'Substituindo driver...'
+        Write-Output 'Instalando driver da impressora...'
 
         foreach ($device in $printer.devices) {
             pnputil /remove-device $device.InstanceId /force | Out-Null
@@ -160,6 +152,16 @@ function Replace-PrinterDrivers ($Printers) {
 }
 
 
+function Install-FiservAgent {
+    Copy-Item -Path .\fiserv -Destination C:\AgenteCliSiTef -Recurse
+    pushd C:\AgenteCliSiTef
+    .\CertMgr.exe -add .\ca_cert.pem -all -s -r localMachine root | Out-Null
+    .\agenteCliSiTef.exe -i | Out-Null
+    net start AgenteCliSiTef | Out-Null
+    popd
+}
+
+
 function Main {
     Set-Location $prefix
 
@@ -167,27 +169,34 @@ function Main {
 
     $any_failure = $false
 
-    Write-Host "Buscando maquininha conectada..."
+    Write-Output 'Buscando maquininha conectada...'
     if ($pos_devices = Find-PosDevices) {
         Install-PosDrivers -Devices $pos_devices
     } else {
-        Write-Host 'Maquininha não encontrada.'
+        Write-Output 'Maquininha não encontrada.'
         $any_failure = $true
     }
 
-    Write-Host "Buscando impressora conectada..."
+    if (Get-WmiObject -Class Win32_Service -Filter 'Name="AgenteCliSiTef"') {
+        Write-Output 'Agente Fiserv SiTef já está instalado.'
+    } else {
+        Write-Output 'Instalando Agente Fiserv SiTef...'
+        Install-FiservAgent
+    }
+
+    Write-Output 'Buscando impressora conectada...'
     if ($printers = Find-PrinterDevices) {
         Replace-PrinterDrivers -Printers $printers
         pnputil /scan-devices | Out-Null
     } else {
-        Write-Host 'Impressora não encontrada.'
+        Write-Output 'Impressora não encontrada.'
         $any_failure = $true
     }
 
     if ($any_failure) {
-        Write-Host 'Entre em contato com o nosso suporte.'
+        Write-Output 'Entre em contato com o nosso suporte.'
     } else {
-        Write-Host 'Instalação concluída com sucesso!'
+        Write-Output 'Instalação concluída com sucesso!'
     }
 }
 
@@ -198,5 +207,6 @@ try {
     Write-Error $_
 }
 
-Write-Host 'Pressione [Enter] para fechar.'
+
+Write-Output 'Pressione [Enter] para fechar.'
 Read-Host | Out-Null
