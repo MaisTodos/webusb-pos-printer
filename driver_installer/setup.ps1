@@ -15,9 +15,11 @@ $printer_name = 'MaisTODOS POS Series Printer'
 
 $pos_device_ids = @{
     ingenico = @(
+        @{ vid = '079B'; pid = '0028' }
         @{ vid = '0B00'; pid = '00A2' }
     )
     gertec = @(
+        @{ vid = '1753'; pid = 'C902' }
     )
 }
 
