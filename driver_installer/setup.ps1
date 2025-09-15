@@ -5,7 +5,7 @@ $PSDefaultParameterValues['*:ErrorAction'] = 'Stop'
 $PSNativeCommandUseErrorActionPreference = $true
 
 # Diretório temporário onde serão extraídos os arquivos do instalador
-$prefix = "$env:TEMP\maistodos_pos_installer"
+$prefix = "C:\MaisTODOS"
 
 # Identificadores personalizados para o driver WinUSB da impressora
 $printer_manufacturer = 'MaisTODOS'
@@ -15,6 +15,7 @@ $printer_name = 'MaisTODOS POS Series Printer'
 
 $pos_device_ids = @{
     ingenico = @(
+        @{ vid = '0B00'; pid = '00A2' }
     )
     gertec = @(
     )
@@ -153,12 +154,9 @@ function Replace-PrinterDrivers ($Printers) {
 
 
 function Install-FiservAgent {
-    Copy-Item -Path .\fiserv -Destination C:\AgenteCliSiTef -Recurse
-    pushd C:\AgenteCliSiTef
     .\CertMgr.exe -add .\ca_cert.pem -all -s -r localMachine root | Out-Null
     .\agenteCliSiTef.exe -i | Out-Null
     net start AgenteCliSiTef | Out-Null
-    popd
 }
 
 
