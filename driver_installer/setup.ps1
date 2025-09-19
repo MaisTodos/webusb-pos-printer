@@ -75,20 +75,27 @@ function Install-PosDrivers ($Devices) {
 
         switch ($device_brand) {
             'gertec' {
-                if (Find-InstalledPackage -Pattern 'Gertec-Full-Installer' -and ) {
+                if (Find-InstalledPackage -Pattern 'Gertec-Full-Installer*' -and ) {
                     Write-Output 'Driver da maquininha Gertec já está instalado.'
                 } else {
+                    Push-Location .\gertec
                     Write-Output 'Instalando driver da maquininha Gertec...'
-                    Start-Process -FilePath '.\gertec-installer.exe' -ArgumentList '/S' -Wait
-                    Start-Process -FilePath '.\gertec-pin-pad-installer.exe' -ArgumentList '/s','/v' -Wait
+                    Start-Process -FilePath '.\Gertec-Full-Installer_2.2.2.0.exe' -ArgumentList '/S' -Wait
+                    Start-Process -FilePath '.\Gertec_Certificates_Installer_1.2.0.0.exe' -Wait
+                    Start-Process -FilePath '.\Gertec_PIN_pad_Driver_Installer_2.7.3.0.exe' -ArgumentList '/s','/d','/f:1' -Wait
+                    Start-Process -FilePath '.\Gertec-WebAPI_Installer_2.2.0.1.exe' -ArgumentList '/S' -Wait
+                    Start-Process -FilePath '.\SerialDevMan_Setup_1.2.0.5.exe' -ArgumentList '/S'
+                    Copy-Item -Path '.\gpinpad.dll' -Destination 'C:\Windows\gpinpad.dll' -Force
+                    Pop-Location
                 }
             }
             'ingenico' {
-                if (Find-InstalledPackage -Pattern 'Ingenico*') {
+                if (Find-InstalledPackage -Pattern 'Ingenico USB Drivers*') {
                     Write-Output 'Driver da maquininha Ingenico já está instalado.'
                 } else {
+                    Push-Location .\ingenico
                     Write-Output 'Instalando driver da maquininha Ingenico...'
-                    Start-Process -FilePath '.\ingenico-installer.exe' -ArgumentList '/S' -Wait
+                    Start-Process -FilePath '.\IngenicoUSBDrivers_3.40_setup_SIGNED.exe' -ArgumentList '/S' -Wait
                 }
             }
         }
@@ -153,26 +160,24 @@ function Replace-PrinterDrivers ($Printers) {
 
 
 function Install-FiservAgent {
-    pushd .\fiserv
+    Push-Location .\fiserv
     .\CertMgr.exe -add .\ca_cert.pem -all -s -r localMachine root
-    try { net stop AgenteCliSiTef 2> $null } catch {}
     .\agenteCliSiTef.exe -i
     net start AgenteCliSiTef
-    popd
+    Pop-Location
 }
 
 function Uninstall-FiservAgent {
-    pushd .\fiserv
+    Push-Location .\fiserv
     .\agenteCliSiTef.exe -u
-    popd
+    Pop-Location
 }
 
 function Main {
     Set-Location $prefix
 
-    if (Test-Path -Path "$prefix\fiserv") {
-        Uninstall-FiservAgent
-    }
+    # Precisamos parar o agente da fiserv para poder extrair o zip
+    try { net stop AgenteCliSiTef 2> $null } catch {}
 
     Expand-Archive -Path .\installers.zip -DestinationPath . -Force
 
