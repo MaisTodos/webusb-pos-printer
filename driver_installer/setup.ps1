@@ -24,11 +24,14 @@ $pos_device_ids = @{
 }
 
 $printer_device_ids = @(
+    # POS-58
     @{ vid = '0416'; pid = '5011' }
     @{ vid = '0456'; pid = '0808' }
     @{ vid = '0483'; pid = '070B' }
     @{ vid = '0519'; pid = '2015' }
     @{ vid = '28E9'; pid = '0289' }
+    # POS-80
+    @{ vid = '1FC9'; pid = '2016' }
 )
 
 

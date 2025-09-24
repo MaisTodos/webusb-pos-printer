@@ -1,10 +1,13 @@
 (function () {
     const KNOWN_DEVICES = [
+        // POS-58
         { vendorId: 0x0416, productId: 0x5011 },
         { vendorId: 0x0456, productId: 0x0808 },
         { vendorId: 0x0483, productId: 0x070b },
         { vendorId: 0x0519, productId: 0x2015 },
         { vendorId: 0x28e9, productId: 0x0289 },
+        // POS-80
+        { vendorId: 0x1fc9, productId: 0x2016 },
     ];
 
     const ESC = "\x1b";
