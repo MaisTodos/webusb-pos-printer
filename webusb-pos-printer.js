@@ -45,8 +45,8 @@
             return this.append(`${GS}L${u16(dots)}`);
         }
 
-        feedPaper(dots) {
-            return this.append(`${ESC}J${u8(dots)}`);
+        feedPaper(lines) {
+            return this.append(new Array(lines + 1).join("\n"));
         }
 
         cutPaper() {
@@ -121,7 +121,7 @@
                         .setMode(1) // 8x16 font
                         .setLeftMargin(4 * mm)
                         .append(text)
-                        .feedPaper(15 * mm);
+                        .feedPaper(8);
                     break;
                 case "POS-80":
                     encoder
@@ -129,8 +129,9 @@
                         .setMode(0) // 12x24 font
                         .setLeftMargin(7 * mm)
                         .append(text)
-                        .feedPaper(24 * mm)
-                        .cutPaper();
+                        .feedPaper(10)
+                        .cutPaper()
+                        .feedPaper(3);
                     break;
             }
             const encodedText = encoder.encode();
