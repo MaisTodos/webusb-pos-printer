@@ -121,7 +121,7 @@
                         .setMode(1) // 8x16 font
                         .setLeftMargin(4 * mm)
                         .append(text)
-                        .feedPaper(8);
+                        .feedPaper(4);
                     break;
                 case "POS-80":
                     encoder
@@ -129,9 +129,9 @@
                         .setMode(0) // 12x24 font
                         .setLeftMargin(7 * mm)
                         .append(text)
-                        .feedPaper(10)
+                        .feedPaper(7)
                         .cutPaper()
-                        .feedPaper(3);
+                        .feedPaper(2);
                     break;
             }
             const encodedText = encoder.encode();
