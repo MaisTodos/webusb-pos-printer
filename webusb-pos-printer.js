@@ -1,13 +1,11 @@
 (function () {
     const KNOWN_DEVICES = [
-        // POS-58
-        { vendorId: 0x0416, productId: 0x5011 },
-        { vendorId: 0x0456, productId: 0x0808 },
-        { vendorId: 0x0483, productId: 0x070b },
-        { vendorId: 0x0519, productId: 0x2015 },
-        { vendorId: 0x28e9, productId: 0x0289 },
-        // POS-80
-        { vendorId: 0x1fc9, productId: 0x2016 },
+        { vendorId: 0x0416, productId: 0x5011, model: "POS-58" },
+        { vendorId: 0x0456, productId: 0x0808, model: "POS-58" },
+        { vendorId: 0x0483, productId: 0x070b, model: "POS-58" },
+        { vendorId: 0x0519, productId: 0x2015, model: "POS-58" },
+        { vendorId: 0x28e9, productId: 0x0289, model: "POS-58" },
+        { vendorId: 0x1fc9, productId: 0x2016, model: "POS-80" },
     ];
 
     const ESC = "\x1b";
@@ -50,6 +48,10 @@
         feedPaper(dots) {
             return this.append(`${ESC}J${u8(dots)}`);
         }
+
+        cutPaper() {
+            return this.append(`${GS}V${u8(1)}`);
+        }
     }
 
     async function requestUsbPrinter() {
@@ -65,6 +67,17 @@
         }
 
         return navigator.usb.requestDevice({ filters: KNOWN_DEVICES });
+    }
+
+    function getPrinterModel(device) {
+        for (const knownDevice of KNOWN_DEVICES) {
+            if (
+                device.vendorId === knownDevice.vendorId &&
+                device.productId === device.productId
+            ) {
+                return knownDevice.model;
+            }
+        }
     }
 
     async function connectEndpoint(device, direction) {
@@ -95,16 +108,32 @@
 
     window.webusbPosPrinter = {
         async printText(text) {
-            const mm = 8; // DPI = 203
-            const encodedText = new PosEncoder()
-                .reset()
-                .setMode(1) // 8x16 font
-                .setLeftMargin(4 * mm)
-                .append(text)
-                .feedPaper(15 * mm)
-                .encode();
-
             const printer = await requestUsbPrinter();
+            const model = getPrinterModel(printer);
+
+            const mm = 8; // DPI = 203
+
+            const encoder = new PosEncoder();
+            switch (model) {
+                case "POS-58":
+                    encoder
+                        .reset()
+                        .setMode(1) // 8x16 font
+                        .setLeftMargin(4 * mm)
+                        .append(text)
+                        .feedPaper(15 * mm);
+                    break;
+                case "POS-80":
+                    encoder
+                        .reset()
+                        .setMode(0) // 12x24 font
+                        .setLeftMargin(7 * mm)
+                        .append(text)
+                        .cutPaper();
+                    break;
+            }
+            const encodedText = encoder.encode();
+
             await printer.open();
             const endpoint = await connectEndpoint(printer, "out");
             await printer.transferOut(endpoint, encodedText);
