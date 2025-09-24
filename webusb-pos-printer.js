@@ -129,6 +129,7 @@
                         .setMode(0) // 12x24 font
                         .setLeftMargin(7 * mm)
                         .append(text)
+                        .feedPaper(24 * mm);
                         .cutPaper();
                     break;
             }
