@@ -3,34 +3,6 @@ on:
     types: [published]
 
 jobs:
-  build_installer:
-    name: Build Driver Installer
-    runs-on: windows-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          lfs: true
-
-      - name: Install dependencies
-        run: |
-          Set-PSRepository PSGallery -InstallationPolicy Trusted
-          Install-Module PS2EXE
-
-      - name: Build
-        run: |
-          cd driver_installer
-          .\build.ps1
-
-      - name: Upload Release
-        shell: bash
-        env:
-          GITHUB_TOKEN: ${{ github.TOKEN }}
-        run: |
-          cd driver_installer
-          gh release upload ${{ github.event.release.tag_name }} setup.exe
-
   upload_library:
     name: Upload Javascript Library
     runs-on: ubuntu-latest
